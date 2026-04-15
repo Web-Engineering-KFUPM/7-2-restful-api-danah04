@@ -4,29 +4,7 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 
 /*Steps:
- =================================================================
- *  TASK 2 — Create Schema & Model (file: server/models/song.model.js)
- *  =================================================================
- *  Goal:
- *    - Define a Song schema with fields:
- *        title (String, required)
- *        artist (String, required)
- *        year (Number)
- *    - Export a Mongoose model named "Song".
- *
- *  Example:
- *    name: { type: String, required: true, trim: true }
- *      Note: trim is used to remove the extra spaces automatically.
- * 
- *  Syntax hint:
- * 
-      const songSchema = new mongoose.Schema({
-        title:  { type: _______, required: _____, trim: _____ },
-        artist: { type: _______, required: _____, trim: _____ },
-        year:   { type: _______, min: _____, max: _____ }
-      }, { timestamps: _____ });
-
-      const Song = mongoose.model("Song", songSchema);
+ 
  */
 
 
@@ -47,10 +25,32 @@ dotenv.config();
 await mongoose.connect(process.env.MONGO_URL);
 
 // api/songs (Read all songs)
+app.get("/songs", async (_req, res) => {
+        const rows = await Song.find().sort({ createdAt: -1 });
+        res.json(rows);
+});
 
+app.get("/songs/:id", async (req, res) => {
+const s = await Song.findById(req.params.id);
+if (!s) return res.status(404).json({ message: "Song not found" });
+res.json(s);
+});
 
 // api/songs (Insert song)
-
+app.post("/songs", async (req, res) => {
+        try {
+          const { title = "", artist = "", year } = req.body || {};
+          const created = await Song.create({
+            title: title.trim(),
+            artist: artist.trim(),
+            year
+          });
+          res.status(201).json(created);
+        } catch (err) {
+          res.status(400).json({ message: err.message || "Failed to create song" });
+        }
+      });
+      
 // /api/songs/:id (Update song)
 
 
