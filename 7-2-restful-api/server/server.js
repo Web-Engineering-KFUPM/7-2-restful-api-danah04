@@ -3,11 +3,6 @@ import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
-/*Steps:
- 
- */
-
-
 // import dotenv and load environment variables from .env
 
 import { connectDB } from "./db.js";
@@ -49,7 +44,8 @@ app.post("/songs", async (req, res) => {
         } catch (err) {
           res.status(400).json({ message: err.message || "Failed to create song" });
         }
-      });
+});
+
 // /api/songs/:id (Update song)
 app.put("/songs/:id", async (req, res) => {
         try {
@@ -66,5 +62,11 @@ app.put("/songs/:id", async (req, res) => {
       });
 
 // /api/songs/:id (Delete song)
+app.delete("/songs/:id", async (req, res) => {
+        const deleted = await Song.findByIdAndDelete(req.params.id);
+        if (!deleted) return res.status(404).json({ message: "Song not found" });
+        res.json(deleted);
+      });
 
+      
 app.listen(PORT, () => console.log(`API running on http://localhost:${PORT}`));
